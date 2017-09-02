@@ -12,11 +12,37 @@ namespace PartimeSalaryWithTdd
         public int HourlySalary { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+        public double FirstOverTimeRatio { get; set; }
+        public double SecondOverTimeRatio { get; set; }
 
         public double CalculateSalary()
         {
             var workingHour = this.GetWorkingHour();
-            return workingHour * this.HourlySalary;
+            var isNormalWork = workingHour <= 8;
+            if (isNormalWork)
+                return workingHour * this.HourlySalary;
+            else
+            {
+                var normalPay = 8 * this.HourlySalary;
+                var overtimePay = GetOvertimePay(workingHour);
+                return normalPay + overtimePay;
+            }
+        }
+
+        private double GetOvertimePay(double workingHour)
+        {
+            var overtimeHour = workingHour - 8;
+            if (overtimeHour <= 2)
+            {
+                var overtimePay = overtimeHour * this.HourlySalary * this.FirstOverTimeRatio;
+                return overtimePay;
+            }
+            else
+            {
+                var firstOvertimePay = 2 * this.HourlySalary * this.FirstOverTimeRatio;
+                var secondOvertimePay = (overtimeHour - 2) * this.HourlySalary * this.SecondOverTimeRatio;
+                return firstOvertimePay + secondOvertimePay;
+            }
         }
 
         private double GetWorkingHour()
